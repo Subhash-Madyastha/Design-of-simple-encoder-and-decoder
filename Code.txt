@@ -1,0 +1,57 @@
+#include <iostream>
+#include <iomanip>
+#include <string>
+#include <sstream>
+#include <cstdlib>
+
+using namespace std;
+
+string int2hex(int16_t num){
+    stringstream sstream;
+    sstream << setfill('0') << setw(4) << std::hex << num;
+    string result = sstream.str();
+    return result;
+}
+
+string encoder(int16_t num){
+
+    num = num + 8192;
+    num = ((num << 1) & 0x7F00) | (num & 0x7F);
+    return int2hex(num);
+}
+
+int16_t decoder(string hi, string lo)
+{
+    int16_t hiInt;
+    int16_t loInt;
+    int16_t num;
+
+    hiInt = strtol(hi.c_str(),0,16);
+    loInt = strtol(lo.c_str(),0,16);
+    num = ((hiInt & 0x7F) << 7) | (loInt & 0x7F);
+    num -= 8192;
+    return num;
+}
+
+int main()
+{
+    int16_t num;
+    string result;
+    string hi;
+    string lo;
+    cout<<"Enter an integer number bw -8192 to 8191:  ";
+    cin>>num;
+
+    result = encoder(num);
+    cout << "Encoded value is: "<< result << endl<< endl;
+
+    cout << "Enter a high byte (in hex) bw 00 and 7F: ";
+    cin >> hi;
+
+    cout << "Enter a low byte (in hex) bw 00 and 7F: ";
+    cin >> lo;
+
+    num = decoder(hi, lo);
+    cout << "Decoded value is : " << num << endl;
+    return 0;
+}
